@@ -95,15 +95,17 @@ def ddpg(n_episodes=6500, max_t=1000):
                 # The state itself is the racket position and velocity, then
                 # ball position and velocity
                 action = agent.act(state)
-                actions.append(action)
+                if len(actions):
+                    actions = np.append(actions, action, axis=0)
+                else:
+                    # The first time
+                    actions = action
 
             # Put all the states into a list of lists and feed it to the
             # environment
-            actions = np.random.randn(n_agents, action_size)
-            actions = np.clip(actions, -1, 1)
+            # actions = np.random.randn(n_agents, action_size)
+            # actions = np.clip(actions, -1, 1)
 
-            # This is a pesky typing problem...
-            # actions = np.array(actions,dtype="float64")
             env_info = env.step(actions)[brain_name]
             next_states = env_info.vector_observations
             rewards = env_info.rewards
