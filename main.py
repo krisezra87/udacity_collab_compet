@@ -129,14 +129,14 @@ def ddpg(n_episodes=6500, max_t=1000):
 
         if i_episode % 100 == 0:
             print(
-                  (f'\rEpisode {i_episode}',
-                   f'\tAverage Score: {np.mean(scores_window):.2f}')
-                  )
+                  f'Episode {i_episode} -',
+                  f'Average Score: {np.mean(scores_window):.2f}')
+
 
         if np.mean(scores_window) >= 0.5:
             print(
-                  (f'\nEnvironment solved in {i_episode-100:d} episodes!',
-                   f'\tAverage Score: {np.mean(scores_window):.2f}')
+                  f'Environment solved in {i_episode-100:d} episodes! -',
+                   f'Average Score: {np.mean(scores_window):.2f}'
                   )
             # If we win, we need to save the checkpoint
             for i, agent in enumerate(agents):

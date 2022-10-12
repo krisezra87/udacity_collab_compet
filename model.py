@@ -24,8 +24,8 @@ class Actor(nn.Module):
 
         # Define the number of nodes in the network here.  Not changing
         # and keeps the signature simple
-        net1_nodes = 256
-        net2_nodes = 128
+        net1_nodes = 512
+        net2_nodes = 256
 
         super().__init__()
         self.seed = torch.manual_seed(seed)
@@ -61,8 +61,8 @@ class Critic(nn.Module):
 
         # Define the number of nodes in the network here.  Not changing
         # and keeps the signature simple
-        net1_nodes = 256
-        net2_nodes = 128
+        net1_nodes = 512
+        net2_nodes = 256
 
         super(Critic, self).__init__()
         self.seed = torch.manual_seed(seed)
