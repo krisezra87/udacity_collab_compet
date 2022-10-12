@@ -18,13 +18,12 @@ env = UnityEnvironment(file_name="Tennis_Linux/Tennis.x86_64")
 brain_name = env.brain_names[0]
 brain = env.brains[brain_name]
 
-
 n_agents = len(env.reset(train_mode=True)[brain_name].agents)
 
 agents = []
 
 # Set up the agents generically for state and action sizes and number of agents
-for i in range(n_agents):
+for _ in range(n_agents):
     # Create the agents and let them share a replay buffer
     if agents:
         memory = None
@@ -32,9 +31,11 @@ for i in range(n_agents):
         memory = agents[-1].memory
 
     new_agent = Agent(state_size=brain.vector_observation_space_size,
-                      action_size=brain.vector_action_space_size,memory=memory)
+                      action_size=brain.vector_action_space_size,
+                      memory=memory)
 
     agents.append(new_agent)
+
 
 # Train the agent
 def ddpg(n_episodes=6500, max_t=1000):
@@ -69,7 +70,7 @@ def ddpg(n_episodes=6500, max_t=1000):
         for _ in range(max_t):
             # Go get the actions for each agent, given the current state
             actions = []
-            for agent, state in zip(agents,states):
+            for agent, state in zip(agents, states):
                 action = agent.act(state)
                 actions.append(action)
 
@@ -90,23 +91,25 @@ def ddpg(n_episodes=6500, max_t=1000):
             agent_scores += rewards
             if np.any(dones):
                 break
-        # save most recent episode score in moving average and to the complete list
-        # Recall that the episode score is the maximum score of any agent
+        # save most recent episode score in moving average and to the complete
+        # list. Recall that the episode score is the maximum score of any agent
         episode_score = np.max(agent_scores)
         scores_window.append(episode_score)
         scores.append(episode_score)
 
         if i_episode % 100 == 0:
             print(
-                    '\rEpisode {}\tAverage Score: {:.2f}'.format(
-                        i_episode, np.mean(scores_window)))
+                  (f'\rEpisode {i_episode}',
+                   f'\tAverage Score: {np.mean(scores_window):.2f}')
+                  )
 
         if np.mean(scores_window) >= 0.5:
             print(
-                    '\nEnvironment solved in {:d} episodes!\tAverage Score: {:.2f}'.format(
-                        i_episode-100, np.mean(scores_window)))
+                  (f'\nEnvironment solved in {i_episode-100:d} episodes!',
+                   f'\tAverage Score: {np.mean(scores_window):.2f}')
+                  )
             # If we win, we need to save the checkpoint
-            for i,agent in enumerate(agents):
+            for i, agent in enumerate(agents):
                 torch.save(agent.actor_local.state_dict(),
                            F'checkpoint-actor{i}.pth')
                 torch.save(agent.critic_local.state_dict(),
