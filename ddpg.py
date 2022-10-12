@@ -7,14 +7,14 @@ from model import Actor, Critic
 
 import torch
 import torch.nn.functional as F
-from torch import optim as optim
+from torch import optim
 
-BUFFER_SIZE = int(1e5)   # replay buffer size
-BATCH_SIZE = 128         # minibatch size
+BUFFER_SIZE = int(1e6)   # replay buffer size
+BATCH_SIZE = 512         # minibatch size
 GAMMA = 0.99             # discount factor
-TAU = 1e-3               # for soft update of target parameters
+TAU = 1e-2               # for soft update of target parameters
 LR_ACTOR = 1e-3          # learning rate (Actor)
-LR_CRITIC = 1e-4         # learning rate (Critic)
+LR_CRITIC = 1e-3         # learning rate (Critic)
 L2_WEIGHT_DECAY = 0      # L2 Weight Decay from Paper
 
 
@@ -35,7 +35,7 @@ class Agent():
         """
         self.state_size = state_size
         self.action_size = action_size
-        self.seed = random.seed(seed)
+        random.seed(seed)
 
         # Actor Network
         # Specify both a local network and a target network that is
@@ -51,11 +51,13 @@ class Agent():
         self.critic_local = Critic(state_size, action_size, seed).to(device)
         self.critic_target = Critic(state_size, action_size, seed).to(device)
         self.critic_optimizer = optim.Adam(
-                self.critic_local.parameters(), lr=LR_CRITIC, weight_decay=L2_WEIGHT_DECAY)
+                self.critic_local.parameters(), lr=LR_CRITIC,
+                weight_decay=L2_WEIGHT_DECAY)
 
         # Replay memory (but allow us to keep a shared memory if we like)
         if memory is None:
-            self.memory = ReplayBuffer(action_size, BUFFER_SIZE, BATCH_SIZE, seed)
+            self.memory = ReplayBuffer(action_size, BUFFER_SIZE, BATCH_SIZE,
+                                       seed)
         else:
             self.memory = memory
 
@@ -63,6 +65,7 @@ class Agent():
         self.noise = OUProcess(action_size, seed)
 
     def step(self, state, action, reward, next_state, done):
+        """ Add to memory and/or do some learning """
         # Save experience in replay memory
         self.memory.add(state, action, reward, next_state, done)
 
@@ -78,7 +81,8 @@ class Agent():
         Params
         ======
             state (array_like): current state
-            include_noise (bool): Whether or not to include noise on the samples (Ornstein-Uhlenbeck Process)
+            include_noise (bool): Whether or not to include sample noise
+            (Ornstein-Uhlenbeck Process)
         """
         state = torch.from_numpy(state).float().unsqueeze(0).to(device)
         self.actor_local.eval()
@@ -95,20 +99,22 @@ class Agent():
     def learn(self, experiences, gamma):
         """Update value parameters using given batch of experience tuples.
 
-        Recall that the actor is attempting to predict the next action, and the critic is attempting to predict the Q-value.
+        Recall that the actor is attempting to predict the next action, and the
+        critic is attempting to predict the Q-value.
 
         actor_target(state) returns the next action
         critic_target(state, action) returns a q value
-        Q_targets = reward + gamma * critic_target(next_state, actor_target(next_state))
+        Q_targets = reward + gamma * critic_target(next_state,
+                                                   actor_target(next_state))
 
         Params
         ======
-            experiences (Tuple[torch.Tensor]): tuple of (s, a, r, s', done) tuples
+            experiences (Tuple[torch.Tensor]): tuple of (s, a, r, s', done)
             gamma (float): discount factor
         """
         states, actions, rewards, next_states, dones = experiences
 
-        ## Update the critic
+        # Update the critic
         next_actions = self.actor_target(next_states)
         q_targets_next = self.critic_target(next_states, next_actions)
 
@@ -131,6 +137,8 @@ class Agent():
         loss = -self.critic_local(states, predicted_actions).mean()
         self.actor_optimizer.zero_grad()
         loss.backward()
+
+        torch.nn.utils.clip_grad_norm_(self.critic_local.parameters(), 1)
         self.actor_optimizer.step()
 
         # Now update the target networks with a soft update
@@ -138,7 +146,7 @@ class Agent():
         self.soft_update(self.critic_local, self.critic_target, TAU)
 
     def reset(self):
-        # Reset the noise function back to the original mean value
+        """ Reset the noise function back to the original mean value """
         self.noise.reset()
 
     def soft_update(self, local_model, target_model, tau):
@@ -153,8 +161,10 @@ class Agent():
 
         Blatant reuse from last project lol.
         """
-        for target_param, local_param in zip(target_model.parameters(), local_model.parameters()):
-            target_param.data.copy_(tau*local_param.data + (1.0-tau)*target_param.data)
+        for target_param, local_param in zip(target_model.parameters(),
+                                             local_model.parameters()):
+            target_param.data.copy_(
+                    tau*local_param.data + (1.0-tau)*target_param.data)
 
 
 class ReplayBuffer:
@@ -173,8 +183,11 @@ class ReplayBuffer:
         self.action_size = action_size
         self.memory = deque(maxlen=buffer_size)
         self.batch_size = batch_size
-        self.experience = namedtuple("Experience", field_names=["state", "action", "reward", "next_state", "done"])
-        self.seed = random.seed(seed)
+        self.experience = namedtuple("Experience",
+                                     field_names=["state", "action",
+                                                  "reward", "next_state",
+                                                  "done"])
+        random.seed(seed)
 
     def add(self, state, action, reward, next_state, done):
         """Add a new experience to memory."""
