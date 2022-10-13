@@ -34,7 +34,7 @@ Once enough training timesteps were acquired to satisfy the batch size (256 meas
 | Buffer Size | 1,000,000       |
 | Batch Size  | 256        |
 | Discount Factor | 0.99 |
-| Soft Update Parameter| 0.99  |
+| Soft Update Parameter| 0.999 |
 | Actor Learning Rate (both players) | 1e-3 |
 | Critic Learning Rate (both players)| 1e-3 |
 | L2 Weight Decay | 0 |

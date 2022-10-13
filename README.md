@@ -54,7 +54,7 @@ Evidence of the solution can be seen in the graphic below.
 ### ddpg.py
 This file contains the code for training the agent after both the actor and critic networks have been configured.
 It also includes the class that generates the Ornstein-Uhlenbeck noise added to the actions.
-Most of this class was directly reused from Project 2: Continuous Control, excepting the hyperparameters which are detailed in [the report](Report.md)
+Most of this class was directly reused from Project 2: Continuous Control, excepting the hyperparameters which are detailed in [the report](Report.md).
 
 ### model.py
 This file contains the pytoch-based neural network logic to set up the actor and critic which are used for both player agents.
