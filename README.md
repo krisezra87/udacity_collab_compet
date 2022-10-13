@@ -8,7 +8,8 @@ The objective is to teach them to play... better!
 ### The Environment
 In this environment, the observation space consists of 3 stacked frames with 8 variables each: xy-position and velocity for the racket and xy-position and velocity for the ball where each position and velocity is a two-vector.
 Each racket may take an action in a two-dimensional space: move left or right, or move up or down.
-Thus the action space is a two-vector that is bounded between -1 and 1 for both x and y movement.
+Each frame is an instance of time where the most recent is the current state and each of the last two timesteps are the other two stacked states (respectively).
+The action space is a two-vector that is bounded between -1 and 1 for both x and y movement.
 Each episode ends when a point is scored.
 
 In the game, two agents control rackets to bounce a ball over a net.
