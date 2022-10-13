@@ -1,29 +1,28 @@
-[//]: # (Image References)
-
-[image1]: https://user-images.githubusercontent.com/10624937/42135623-e770e354-7d12-11e8-998d-29fc74429ca2.gif "Trained Agent"
-[image2]: https://user-images.githubusercontent.com/10624937/42135622-e55fb586-7d12-11e8-8a54-3c31da15a90a.gif "Soccer"
-
-
 # Project 3: Collaboration and Competition
 
-### Introduction
+## Introduction
 
-For this project, you will work with the [Tennis](https://github.com/Unity-Technologies/ml-agents/blob/master/docs/Learning-Environment-Examples.md#tennis) environment.
+This Project uses the [Tennis](https://github.com/Unity-Technologies/ml-agents/blob/master/docs/Learning-Environment-Examples.md#tennis) environment which allows two agents to play tennis together.
+The objective is to teach them to play... better!
 
-![Trained Agent][image1]
+### The Environment
+In this environment, the observation space consists of 3 stacked frames with 8 variables each: xy-position and velocity for the racket and xy-position and velocity for the ball where each position and velocity is a two-vector.
+Each racket may take an action in a two-dimensional space: move left or right, or move up or down.
+Thus the action space is a two-vector that is bounded between -1 and 1 for both x and y movement.
+Each episode ends when a point is scored.
 
-In this environment, two agents control rackets to bounce a ball over a net. If an agent hits the ball over the net, it receives a reward of +0.1.  If an agent lets a ball hit the ground or hits the ball out of bounds, it receives a reward of -0.01.  Thus, the goal of each agent is to keep the ball in play.
+In the game, two agents control rackets to bounce a ball over a net.
+If an agent hits the ball over the net, it receives a reward of +0.1.
+If an agent lets a ball hit the ground or hits the ball out of bounds, it receives a reward of -0.01.
+The goal of each agent is to keep the ball in play.
 
-The observation space consists of 8 variables corresponding to the position and velocity of the ball and racket. Each agent receives its own, local observation.  Two continuous actions are available, corresponding to movement toward (or away from) the net, and jumping.
+### The Problem
 
-The task is episodic, and in order to solve the environment, your agents must get an average score of +0.5 (over 100 consecutive episodes, after taking the maximum over both agents). Specifically,
+The task training task is episodic, going point by point.
+In order to solve the environment, the agents must get an average maximum score of +0.5 over 100 consecutive episodes (over 100 consecutive episodes, after taking the maximum over both agents).
+That is, the score for each episode is the maximum score obtained by the two agents, and the average of the episode scores for 100 episodes must be greater than +0.5.
 
-- After each episode, we add up the rewards that each agent received (without discounting), to get a score for each agent. This yields 2 (potentially different) scores. We then take the maximum of these 2 scores.
-- This yields a single **score** for each episode.
-
-The environment is considered solved, when the average (over 100 episodes) of those **scores** is at least +0.5.
-
-### Getting Started
+## Getting Started
 
 1. Download the environment from one of the links below.  You need only select the environment that matches your operating system:
     - Linux: [click here](https://s3-us-west-1.amazonaws.com/udacity-drlnd/P3/Tennis/Tennis_Linux.zip)
@@ -37,26 +36,26 @@ The environment is considered solved, when the average (over 100 episodes) of th
 
 2. Place the file in the DRLND GitHub repository, in the `p3_collab-compet/` folder, and unzip (or decompress) the file.
 
-### Instructions
+## Repository Anatomy
 
-Follow the instructions in `Tennis.ipynb` to get started with training your own agent!
+### main.py
+When all dependencies are installed, executing `python main.py` will train the agents using the ddpg algorithm.
+The script will save four checkpoint files (one for the actor and one for the critic for each agent) if the problem is solved: 100 consecutive episodes with an average score greater than or equal to +0.5.
+These files take the format `checkpoint-actorX.pth` and `checkpoint-criticX.pth` where X is either 0 or 1 depending on which agent did the saving.
 
-### (Optional) Challenge: Soccer Environment
+### demo.py
+Running `python demo.py` will execute a demonstration with the trained agents (including both actor and critic networks).
+It should be noted that the environment was solved after 579 episodes yielding an average score of `0.52` over the subsequent 100 consecutive episodes: there is NO GUARANTEE that any randomized run will yield a score greater than 0.5!
+Evidence of the solution can be seen in the graphic below.
 
-After you have successfully completed the project, you might like to solve the more difficult **Soccer** environment.
+![Learning Rate](./training_history.png)
 
-![Soccer][image2]
+### ddpg.py
+This file contains the code for training the agent after both the actor and critic networks have been configured.
+It also includes the class that generates the Ornstein-Uhlenbeck noise added to the actions.
+Most of this class was directly reused from Project 2: Continuous Control, excepting the hyperparameters which are detailed in [the report](Report.md)
 
-In this environment, the goal is to train a team of agents to play soccer.
-
-You can read more about this environment in the ML-Agents GitHub [here](https://github.com/Unity-Technologies/ml-agents/blob/master/docs/Learning-Environment-Examples.md#soccer-twos).  To solve this harder task, you'll need to download a new Unity environment.  (**Note**: Udacity students should not submit a project with this new environment.)
-
-You need only select the environment that matches your operating system:
-- Linux: [click here](https://s3-us-west-1.amazonaws.com/udacity-drlnd/P3/Soccer/Soccer_Linux.zip)
-- Mac OSX: [click here](https://s3-us-west-1.amazonaws.com/udacity-drlnd/P3/Soccer/Soccer.app.zip)
-- Windows (32-bit): [click here](https://s3-us-west-1.amazonaws.com/udacity-drlnd/P3/Soccer/Soccer_Windows_x86.zip)
-- Windows (64-bit): [click here](https://s3-us-west-1.amazonaws.com/udacity-drlnd/P3/Soccer/Soccer_Windows_x86_64.zip)
-
-Then, place the file in the `p3_collab-compet/` folder in the DRLND GitHub repository, and unzip (or decompress) the file.  Next, open `Soccer.ipynb` and follow the instructions to learn how to use the Python API to control the agent.
-
-(_For AWS_) If you'd like to train the agents on AWS (and have not [enabled a virtual screen](https://github.com/Unity-Technologies/ml-agents/blob/master/docs/Training-on-Amazon-Web-Service.md)), then please use [this link](https://s3-us-west-1.amazonaws.com/udacity-drlnd/P3/Soccer/Soccer_Linux_NoVis.zip) to obtain the "headless" version of the environment.  You will **not** be able to watch the agents without enabling a virtual screen, but you will be able to train the agents.  (_To watch the agents, you should follow the instructions to [enable a virtual screen](https://github.com/Unity-Technologies/ml-agents/blob/master/docs/Training-on-Amazon-Web-Service.md), and then download the environment for the **Linux** operating system above._)
+### model.py
+This file contains the pytoch-based neural network logic to set up the actor and critic which are used for both player agents.
+This is also mostly a reuse from Project 2 except that it is now possible to make two agents share the same `ReplayBuffer` for training purposes, and the shapes of the networks have changed.
+The actor and critic agents both now have a first hidden layer with 512 nodes and a second hidden layer with 256 nodes.
